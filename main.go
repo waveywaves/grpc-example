@@ -7,6 +7,10 @@ import (
 	"net"
 	"os"
 
+	_ "database/sql"
+
+	_ "github.com/go-sql-driver/mysql"
+
 	pb "github.com/waveywaves/grpc-example/proto"
 	"google.golang.org/grpc"
 )
