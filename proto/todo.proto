@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+// option java_multiple_files = true;
+// option java_package = "io.grpc.examples.helloworld";
+// option java_outer_classname = "HelloWorldProto";
+
+package todo;
+
+service TodoService {
+  rpc List (Empty) returns (TodoList) {}
+  rpc Create (Todo) returns (Todo) {}
+  rpc Delete (TodoRequestId) returns (Empty) {}
+}
+
+message Empty {}
+
+message Todo {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+}
+
+message TodoRequestId {
+  string id = 1;
+}
+
+message TodoList {
+  repeated Todo todos = 1;
+}
+

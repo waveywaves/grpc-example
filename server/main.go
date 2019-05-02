@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 
-	pb "github.com/waveywaves/grpc-example/protofiles"
+	pb "github.com/waveywaves/grpc-example/proto"
 	"google.golang.org/grpc"
 )
 
@@ -13,13 +14,19 @@ const (
 	port = ":3000"
 )
 
-// server is used to implement helloworld.GreeterServer.
 type server struct{}
 
-// SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in.Name)
-	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
+func (s *server) Create(ctx context.Context, todo *pb.Todo) (*pb.Todo, error) {
+	fmt.Println(todo)
+	return todo, nil
+}
+
+func (s *server) Delete(ctx context.Context, todo *pb.TodoRequestId) (*pb.Empty, error) {
+	return &pb.Empty{}, nil
+}
+
+func (s *server) List(ctx context.Context, empty *pb.Empty) (*pb.TodoList, error) {
+	return &pb.TodoList{}, nil
 }
 
 func main() {
@@ -28,7 +35,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+	pb.RegisterTodoServiceServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
