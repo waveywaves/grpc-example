@@ -7,7 +7,7 @@ import (
 	"net"
 	"os"
 
-	_ "database/sql"
+	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -40,11 +40,37 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	log.Println("DATABASE_SERVICE_NAME : ", os.Getenv("DATABASE_SERVICE_NAME"))
-	log.Println("DATABASE_ENGINE : ", os.Getenv("DATABASE_ENGINE"))
-	log.Println("DATABASE_NAME : ", os.Getenv("DATABASE_NAME"))
-	log.Println("DATABASE_USER : ", os.Getenv("DATABASE_USER"))
-	log.Println("DATABASE_PASSWORD : ", os.Getenv("DATABASE_PASSWORD"))
+	// mysqluser := os.Getenv("DATABASE_USER")
+	mysqlpass := os.Getenv("DATABASE_PASSWORD")
+	mysqladdr := os.Getenv("MYSQL_PORT_3306_TCP_ADDR")
+
+	db, err := sql.Open("mysql", "gogrpc:"+mysqlpass+"@tcp("+mysqladdr+":3306)/")
+	if err != nil {
+		log.Println(err.Error())
+	}
+	defer db.Close()
+
+	_, err = db.Exec("CREATE DATABASE IF NOT EXISTS todosDB")
+	if err != nil {
+		log.Println(err.Error())
+	} else {
+		log.Println("Successfully created database..")
+	}
+
+	_, err = db.Exec("USE todosDB")
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println("DB selected successfully..")
+	}
+
+	results, err := db.Query("CREATE TABLE IF NOT EXISTS todos (id int NOT NULL AUTO_INCREMENT, title VARCHAR(40), content VARCHAR(100), PRIMARY_KEY(id));")
+	if err != nil {
+		log.Println(err.Error())
+	} else {
+		log.Println("Table created successfully..")
+		fmt.Println(results)
+	}
 
 	s := grpc.NewServer()
 	pb.RegisterTodoServiceServer(s, &server{})
