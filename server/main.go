@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	pb "github.com/waveywaves/grpc-example/proto"
 	"google.golang.org/grpc"
@@ -34,6 +35,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	log.Println("DATABASE_SERVICE_NAME : ", os.Getenv("DATABASE_SERVICE_NAME"))
+	log.Println("DATABASE_ENGINE : ", os.Getenv("DATABASE_ENGINE"))
+	log.Println("DATABASE_NAME : ", os.Getenv("DATABASE_NAME"))
+	log.Println("DATABASE_USER : ", os.Getenv("DATABASE_USER"))
+	log.Println("DATABASE_PASSWORD : ", os.Getenv("DATABASE_PASSWORD"))
+
 	s := grpc.NewServer()
 	pb.RegisterTodoServiceServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
