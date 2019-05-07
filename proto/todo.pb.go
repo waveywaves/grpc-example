@@ -2,22 +2,30 @@
 // source: todo.proto
 
 /*
-Package todo is a generated protocol buffer package.
+Package v1 is a generated protocol buffer package.
 
 It is generated from these files:
 	todo.proto
 
 It has these top-level messages:
-	Empty
-	Todo
-	TodoRequestId
-	TodoList
+	ToDo
+	CreateRequest
+	CreateResponse
+	ReadRequest
+	ReadResponse
+	UpdateRequest
+	UpdateResponse
+	DeleteRequest
+	DeleteResponse
+	ReadAllRequest
+	ReadAllResponse
 */
-package todo
+package v1
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
+import google_protobuf "github.com/golang/protobuf/ptypes/timestamp"
 
 import (
 	context "golang.org/x/net/context"
@@ -35,83 +43,326 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type Empty struct {
+// Taks we have to do
+type ToDo struct {
+	// Unique integer identifier of the todo task
+	Id int64 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+	// Title of the task
+	Title string `protobuf:"bytes,2,opt,name=title" json:"title,omitempty"`
+	// Detail description of the todo task
+	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	// Date and time to remind the todo task
+	Reminder *google_protobuf.Timestamp `protobuf:"bytes,4,opt,name=reminder" json:"reminder,omitempty"`
 }
 
-func (m *Empty) Reset()                    { *m = Empty{} }
-func (m *Empty) String() string            { return proto.CompactTextString(m) }
-func (*Empty) ProtoMessage()               {}
-func (*Empty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *ToDo) Reset()                    { *m = ToDo{} }
+func (m *ToDo) String() string            { return proto.CompactTextString(m) }
+func (*ToDo) ProtoMessage()               {}
+func (*ToDo) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-type Todo struct {
-	Id      string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	Title   string `protobuf:"bytes,2,opt,name=title" json:"title,omitempty"`
-	Content string `protobuf:"bytes,3,opt,name=content" json:"content,omitempty"`
-}
-
-func (m *Todo) Reset()                    { *m = Todo{} }
-func (m *Todo) String() string            { return proto.CompactTextString(m) }
-func (*Todo) ProtoMessage()               {}
-func (*Todo) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
-
-func (m *Todo) GetId() string {
+func (m *ToDo) GetId() int64 {
 	if m != nil {
 		return m.Id
 	}
-	return ""
+	return 0
 }
 
-func (m *Todo) GetTitle() string {
+func (m *ToDo) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *Todo) GetContent() string {
+func (m *ToDo) GetDescription() string {
 	if m != nil {
-		return m.Content
+		return m.Description
 	}
 	return ""
 }
 
-type TodoRequestId struct {
-	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+func (m *ToDo) GetReminder() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.Reminder
+	}
+	return nil
 }
 
-func (m *TodoRequestId) Reset()                    { *m = TodoRequestId{} }
-func (m *TodoRequestId) String() string            { return proto.CompactTextString(m) }
-func (*TodoRequestId) ProtoMessage()               {}
-func (*TodoRequestId) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+// Request data to create new todo task
+type CreateRequest struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// Task entity to add
+	ToDo *ToDo `protobuf:"bytes,2,opt,name=toDo" json:"toDo,omitempty"`
+}
 
-func (m *TodoRequestId) GetId() string {
+func (m *CreateRequest) Reset()                    { *m = CreateRequest{} }
+func (m *CreateRequest) String() string            { return proto.CompactTextString(m) }
+func (*CreateRequest) ProtoMessage()               {}
+func (*CreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *CreateRequest) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+func (m *CreateRequest) GetToDo() *ToDo {
+	if m != nil {
+		return m.ToDo
+	}
+	return nil
+}
+
+// Contains data of created todo task
+type CreateResponse struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// ID of created task
+	Id int64 `protobuf:"varint,2,opt,name=id" json:"id,omitempty"`
+}
+
+func (m *CreateResponse) Reset()                    { *m = CreateResponse{} }
+func (m *CreateResponse) String() string            { return proto.CompactTextString(m) }
+func (*CreateResponse) ProtoMessage()               {}
+func (*CreateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *CreateResponse) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+func (m *CreateResponse) GetId() int64 {
 	if m != nil {
 		return m.Id
 	}
+	return 0
+}
+
+// Request data to read todo task
+type ReadRequest struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// Unique integer identifier of the todo task
+	Id int64 `protobuf:"varint,2,opt,name=id" json:"id,omitempty"`
+}
+
+func (m *ReadRequest) Reset()                    { *m = ReadRequest{} }
+func (m *ReadRequest) String() string            { return proto.CompactTextString(m) }
+func (*ReadRequest) ProtoMessage()               {}
+func (*ReadRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *ReadRequest) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
 	return ""
 }
 
-type TodoList struct {
-	Todos []*Todo `protobuf:"bytes,1,rep,name=todos" json:"todos,omitempty"`
+func (m *ReadRequest) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
 }
 
-func (m *TodoList) Reset()                    { *m = TodoList{} }
-func (m *TodoList) String() string            { return proto.CompactTextString(m) }
-func (*TodoList) ProtoMessage()               {}
-func (*TodoList) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+// Contains todo task data specified in by ID request
+type ReadResponse struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// Task entity read by ID
+	ToDo *ToDo `protobuf:"bytes,2,opt,name=toDo" json:"toDo,omitempty"`
+}
 
-func (m *TodoList) GetTodos() []*Todo {
+func (m *ReadResponse) Reset()                    { *m = ReadResponse{} }
+func (m *ReadResponse) String() string            { return proto.CompactTextString(m) }
+func (*ReadResponse) ProtoMessage()               {}
+func (*ReadResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *ReadResponse) GetApi() string {
 	if m != nil {
-		return m.Todos
+		return m.Api
+	}
+	return ""
+}
+
+func (m *ReadResponse) GetToDo() *ToDo {
+	if m != nil {
+		return m.ToDo
+	}
+	return nil
+}
+
+// Request data to update todo task
+type UpdateRequest struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// Task entity to update
+	ToDo *ToDo `protobuf:"bytes,2,opt,name=toDo" json:"toDo,omitempty"`
+}
+
+func (m *UpdateRequest) Reset()                    { *m = UpdateRequest{} }
+func (m *UpdateRequest) String() string            { return proto.CompactTextString(m) }
+func (*UpdateRequest) ProtoMessage()               {}
+func (*UpdateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+func (m *UpdateRequest) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+func (m *UpdateRequest) GetToDo() *ToDo {
+	if m != nil {
+		return m.ToDo
+	}
+	return nil
+}
+
+// Contains status of update operation
+type UpdateResponse struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// Contains number of entities have beed updated
+	// Equals 1 in case of succesfull update
+	Updated int64 `protobuf:"varint,2,opt,name=updated" json:"updated,omitempty"`
+}
+
+func (m *UpdateResponse) Reset()                    { *m = UpdateResponse{} }
+func (m *UpdateResponse) String() string            { return proto.CompactTextString(m) }
+func (*UpdateResponse) ProtoMessage()               {}
+func (*UpdateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+
+func (m *UpdateResponse) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+func (m *UpdateResponse) GetUpdated() int64 {
+	if m != nil {
+		return m.Updated
+	}
+	return 0
+}
+
+// Request data to delete todo task
+type DeleteRequest struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// Unique integer identifier of the todo task to delete
+	Id int64 `protobuf:"varint,2,opt,name=id" json:"id,omitempty"`
+}
+
+func (m *DeleteRequest) Reset()                    { *m = DeleteRequest{} }
+func (m *DeleteRequest) String() string            { return proto.CompactTextString(m) }
+func (*DeleteRequest) ProtoMessage()               {}
+func (*DeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+
+func (m *DeleteRequest) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+func (m *DeleteRequest) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+// Contains status of delete operation
+type DeleteResponse struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// Contains number of entities have beed deleted
+	// Equals 1 in case of succesfull delete
+	Deleted int64 `protobuf:"varint,2,opt,name=deleted" json:"deleted,omitempty"`
+}
+
+func (m *DeleteResponse) Reset()                    { *m = DeleteResponse{} }
+func (m *DeleteResponse) String() string            { return proto.CompactTextString(m) }
+func (*DeleteResponse) ProtoMessage()               {}
+func (*DeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+
+func (m *DeleteResponse) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+func (m *DeleteResponse) GetDeleted() int64 {
+	if m != nil {
+		return m.Deleted
+	}
+	return 0
+}
+
+// Request data to read all todo task
+type ReadAllRequest struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+}
+
+func (m *ReadAllRequest) Reset()                    { *m = ReadAllRequest{} }
+func (m *ReadAllRequest) String() string            { return proto.CompactTextString(m) }
+func (*ReadAllRequest) ProtoMessage()               {}
+func (*ReadAllRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+
+func (m *ReadAllRequest) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+// Contains list of all todo tasks
+type ReadAllResponse struct {
+	// API versioning: it is my best practice to specify version explicitly
+	Api string `protobuf:"bytes,1,opt,name=api" json:"api,omitempty"`
+	// List of all todo tasks
+	ToDos []*ToDo `protobuf:"bytes,2,rep,name=toDos" json:"toDos,omitempty"`
+}
+
+func (m *ReadAllResponse) Reset()                    { *m = ReadAllResponse{} }
+func (m *ReadAllResponse) String() string            { return proto.CompactTextString(m) }
+func (*ReadAllResponse) ProtoMessage()               {}
+func (*ReadAllResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+
+func (m *ReadAllResponse) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+func (m *ReadAllResponse) GetToDos() []*ToDo {
+	if m != nil {
+		return m.ToDos
 	}
 	return nil
 }
 
 func init() {
-	proto.RegisterType((*Empty)(nil), "todo.Empty")
-	proto.RegisterType((*Todo)(nil), "todo.Todo")
-	proto.RegisterType((*TodoRequestId)(nil), "todo.TodoRequestId")
-	proto.RegisterType((*TodoList)(nil), "todo.TodoList")
+	proto.RegisterType((*ToDo)(nil), "v1.ToDo")
+	proto.RegisterType((*CreateRequest)(nil), "v1.CreateRequest")
+	proto.RegisterType((*CreateResponse)(nil), "v1.CreateResponse")
+	proto.RegisterType((*ReadRequest)(nil), "v1.ReadRequest")
+	proto.RegisterType((*ReadResponse)(nil), "v1.ReadResponse")
+	proto.RegisterType((*UpdateRequest)(nil), "v1.UpdateRequest")
+	proto.RegisterType((*UpdateResponse)(nil), "v1.UpdateResponse")
+	proto.RegisterType((*DeleteRequest)(nil), "v1.DeleteRequest")
+	proto.RegisterType((*DeleteResponse)(nil), "v1.DeleteResponse")
+	proto.RegisterType((*ReadAllRequest)(nil), "v1.ReadAllRequest")
+	proto.RegisterType((*ReadAllResponse)(nil), "v1.ReadAllResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -122,130 +373,206 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for TodoService service
+// Client API for ToDoService service
 
-type TodoServiceClient interface {
-	List(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TodoList, error)
-	Create(ctx context.Context, in *Todo, opts ...grpc.CallOption) (*Todo, error)
-	Delete(ctx context.Context, in *TodoRequestId, opts ...grpc.CallOption) (*Empty, error)
+type ToDoServiceClient interface {
+	// Create new todo task
+	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
+	// Read todo task
+	Read(ctx context.Context, in *ReadRequest, opts ...grpc.CallOption) (*ReadResponse, error)
+	// Update todo task
+	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
+	// Delete todo task
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	// Read all todo tasks
+	ReadAll(ctx context.Context, in *ReadAllRequest, opts ...grpc.CallOption) (*ReadAllResponse, error)
 }
 
-type todoServiceClient struct {
+type toDoServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewTodoServiceClient(cc *grpc.ClientConn) TodoServiceClient {
-	return &todoServiceClient{cc}
+func NewToDoServiceClient(cc *grpc.ClientConn) ToDoServiceClient {
+	return &toDoServiceClient{cc}
 }
 
-func (c *todoServiceClient) List(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TodoList, error) {
-	out := new(TodoList)
-	err := grpc.Invoke(ctx, "/todo.TodoService/List", in, out, c.cc, opts...)
+func (c *toDoServiceClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
+	out := new(CreateResponse)
+	err := grpc.Invoke(ctx, "/v1.ToDoService/Create", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *todoServiceClient) Create(ctx context.Context, in *Todo, opts ...grpc.CallOption) (*Todo, error) {
-	out := new(Todo)
-	err := grpc.Invoke(ctx, "/todo.TodoService/Create", in, out, c.cc, opts...)
+func (c *toDoServiceClient) Read(ctx context.Context, in *ReadRequest, opts ...grpc.CallOption) (*ReadResponse, error) {
+	out := new(ReadResponse)
+	err := grpc.Invoke(ctx, "/v1.ToDoService/Read", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *todoServiceClient) Delete(ctx context.Context, in *TodoRequestId, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := grpc.Invoke(ctx, "/todo.TodoService/Delete", in, out, c.cc, opts...)
+func (c *toDoServiceClient) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error) {
+	out := new(UpdateResponse)
+	err := grpc.Invoke(ctx, "/v1.ToDoService/Update", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for TodoService service
-
-type TodoServiceServer interface {
-	List(context.Context, *Empty) (*TodoList, error)
-	Create(context.Context, *Todo) (*Todo, error)
-	Delete(context.Context, *TodoRequestId) (*Empty, error)
+func (c *toDoServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	out := new(DeleteResponse)
+	err := grpc.Invoke(ctx, "/v1.ToDoService/Delete", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-func RegisterTodoServiceServer(s *grpc.Server, srv TodoServiceServer) {
-	s.RegisterService(&_TodoService_serviceDesc, srv)
+func (c *toDoServiceClient) ReadAll(ctx context.Context, in *ReadAllRequest, opts ...grpc.CallOption) (*ReadAllResponse, error) {
+	out := new(ReadAllResponse)
+	err := grpc.Invoke(ctx, "/v1.ToDoService/ReadAll", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-func _TodoService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+// Server API for ToDoService service
+
+type ToDoServiceServer interface {
+	// Create new todo task
+	Create(context.Context, *CreateRequest) (*CreateResponse, error)
+	// Read todo task
+	Read(context.Context, *ReadRequest) (*ReadResponse, error)
+	// Update todo task
+	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
+	// Delete todo task
+	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	// Read all todo tasks
+	ReadAll(context.Context, *ReadAllRequest) (*ReadAllResponse, error)
+}
+
+func RegisterToDoServiceServer(s *grpc.Server, srv ToDoServiceServer) {
+	s.RegisterService(&_ToDoService_serviceDesc, srv)
+}
+
+func _ToDoService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TodoServiceServer).List(ctx, in)
+		return srv.(ToDoServiceServer).Create(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/todo.TodoService/List",
+		FullMethod: "/v1.ToDoService/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TodoServiceServer).List(ctx, req.(*Empty))
+		return srv.(ToDoServiceServer).Create(ctx, req.(*CreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TodoService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Todo)
+func _ToDoService_Read_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TodoServiceServer).Create(ctx, in)
+		return srv.(ToDoServiceServer).Read(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/todo.TodoService/Create",
+		FullMethod: "/v1.ToDoService/Read",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TodoServiceServer).Create(ctx, req.(*Todo))
+		return srv.(ToDoServiceServer).Read(ctx, req.(*ReadRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TodoService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TodoRequestId)
+func _ToDoService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TodoServiceServer).Delete(ctx, in)
+		return srv.(ToDoServiceServer).Update(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/todo.TodoService/Delete",
+		FullMethod: "/v1.ToDoService/Update",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TodoServiceServer).Delete(ctx, req.(*TodoRequestId))
+		return srv.(ToDoServiceServer).Update(ctx, req.(*UpdateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _TodoService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "todo.TodoService",
-	HandlerType: (*TodoServiceServer)(nil),
+func _ToDoService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ToDoServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.ToDoService/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ToDoServiceServer).Delete(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ToDoService_ReadAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadAllRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ToDoServiceServer).ReadAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.ToDoService/ReadAll",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ToDoServiceServer).ReadAll(ctx, req.(*ReadAllRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _ToDoService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "v1.ToDoService",
+	HandlerType: (*ToDoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "List",
-			Handler:    _TodoService_List_Handler,
+			MethodName: "Create",
+			Handler:    _ToDoService_Create_Handler,
 		},
 		{
-			MethodName: "Create",
-			Handler:    _TodoService_Create_Handler,
+			MethodName: "Read",
+			Handler:    _ToDoService_Read_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _ToDoService_Update_Handler,
 		},
 		{
 			MethodName: "Delete",
-			Handler:    _TodoService_Delete_Handler,
+			Handler:    _ToDoService_Delete_Handler,
+		},
+		{
+			MethodName: "ReadAll",
+			Handler:    _ToDoService_ReadAll_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -255,20 +582,31 @@ var _TodoService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("todo.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 227 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x5c, 0x90, 0xcf, 0x4a, 0xc4, 0x40,
-	0x0c, 0xc6, 0x3b, 0xdd, 0xb6, 0xab, 0x29, 0xee, 0x21, 0x7a, 0x18, 0x7a, 0xb1, 0x04, 0x84, 0x3d,
-	0x2c, 0x7b, 0xa8, 0x8f, 0xe0, 0x1f, 0x10, 0x3c, 0x55, 0x5f, 0x40, 0x3b, 0x39, 0x0c, 0xd4, 0x4e,
-	0x6d, 0xa3, 0xe0, 0x0b, 0xf8, 0xdc, 0x32, 0x53, 0x8a, 0xc3, 0xde, 0xf2, 0x25, 0xf9, 0xbe, 0xfc,
-	0x08, 0x80, 0x38, 0xe3, 0x8e, 0xe3, 0xe4, 0xc4, 0x61, 0xe6, 0x6b, 0xda, 0x42, 0xfe, 0xf0, 0x31,
-	0xca, 0x0f, 0x3d, 0x42, 0xf6, 0xea, 0x8c, 0xc3, 0x1d, 0xa4, 0xd6, 0x68, 0x55, 0xab, 0xfd, 0x79,
-	0x9b, 0x5a, 0x83, 0x57, 0x90, 0x8b, 0x95, 0x9e, 0x75, 0x1a, 0x5a, 0x8b, 0x40, 0x0d, 0xdb, 0xce,
-	0x0d, 0xc2, 0x83, 0xe8, 0x4d, 0xe8, 0xaf, 0x92, 0xae, 0xe1, 0xc2, 0xe7, 0xb4, 0xfc, 0xf9, 0xc5,
-	0xb3, 0x3c, 0x99, 0xd3, 0x40, 0x3a, 0xc0, 0x99, 0x5f, 0x78, 0xb6, 0xb3, 0x60, 0x0d, 0xb9, 0xa7,
-	0x98, 0xb5, 0xaa, 0x37, 0xfb, 0xb2, 0x81, 0x63, 0xe0, 0x0b, 0xfe, 0x65, 0xd0, 0xfc, 0x2a, 0x28,
-	0xbd, 0x7e, 0xe1, 0xe9, 0xdb, 0x76, 0x8c, 0x37, 0x90, 0x05, 0x67, 0xb9, 0xac, 0x06, 0xf6, 0x6a,
-	0xf7, 0xef, 0xf3, 0x43, 0x4a, 0x90, 0xa0, 0xb8, 0x9b, 0xf8, 0x4d, 0x18, 0xa3, 0xcc, 0x2a, 0xaa,
-	0x29, 0xc1, 0x03, 0x14, 0xf7, 0xdc, 0xb3, 0x30, 0x5e, 0x46, 0x77, 0x57, 0xee, 0x2a, 0xbe, 0x40,
-	0xc9, 0x7b, 0x11, 0xbe, 0x76, 0xfb, 0x17, 0x00, 0x00, 0xff, 0xff, 0x63, 0x8e, 0x9e, 0xab, 0x43,
-	0x01, 0x00, 0x00,
+	// 415 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x53, 0xcd, 0x8e, 0x9b, 0x30,
+	0x10, 0x16, 0x3f, 0xcb, 0xee, 0x0e, 0x0d, 0xbb, 0x75, 0x7b, 0x40, 0xa8, 0x6a, 0x91, 0x4f, 0xe9,
+	0x05, 0x14, 0x2a, 0xf5, 0xb4, 0xea, 0xaa, 0xda, 0x3c, 0x01, 0x4d, 0x1f, 0x80, 0xc4, 0xd3, 0xc8,
+	0x12, 0x89, 0x29, 0x38, 0x79, 0x84, 0xbe, 0x76, 0x2b, 0xdb, 0x38, 0x09, 0xa8, 0xe4, 0xb2, 0x37,
+	0xe6, 0xf3, 0x37, 0xf3, 0x7d, 0xf3, 0x03, 0x80, 0x14, 0x4c, 0x64, 0x4d, 0x2b, 0xa4, 0x20, 0xee,
+	0x71, 0x91, 0x7c, 0xda, 0x0a, 0xb1, 0xad, 0x31, 0xd7, 0xc8, 0xfa, 0xf0, 0x2b, 0x97, 0x7c, 0x87,
+	0x9d, 0xac, 0x76, 0x8d, 0x21, 0xd1, 0x3f, 0x0e, 0xf8, 0x2b, 0xb1, 0x14, 0x24, 0x02, 0x97, 0xb3,
+	0xd8, 0x49, 0x9d, 0xb9, 0x57, 0xba, 0x9c, 0x91, 0xf7, 0x70, 0x23, 0xb9, 0xac, 0x31, 0x76, 0x53,
+	0x67, 0x7e, 0x5f, 0x9a, 0x80, 0xa4, 0x10, 0x32, 0xec, 0x36, 0x2d, 0x6f, 0x24, 0x17, 0xfb, 0xd8,
+	0xd3, 0x6f, 0x97, 0x10, 0xf9, 0x0a, 0x77, 0x2d, 0xee, 0xf8, 0x9e, 0x61, 0x1b, 0xfb, 0xa9, 0x33,
+	0x0f, 0x8b, 0x24, 0x33, 0x26, 0x32, 0x6b, 0x22, 0x5b, 0x59, 0x13, 0xe5, 0x89, 0x4b, 0x9f, 0x61,
+	0xf6, 0xd2, 0x62, 0x25, 0xb1, 0xc4, 0xdf, 0x07, 0xec, 0x24, 0x79, 0x04, 0xaf, 0x6a, 0xb8, 0x76,
+	0x74, 0x5f, 0xaa, 0x4f, 0xf2, 0x01, 0x7c, 0x29, 0x96, 0x42, 0x3b, 0x0a, 0x8b, 0xbb, 0xec, 0xb8,
+	0xc8, 0x94, 0xf5, 0x52, 0xa3, 0xb4, 0x80, 0xc8, 0x16, 0xe8, 0x1a, 0xb1, 0xef, 0xf0, 0x3f, 0x15,
+	0x4c, 0x93, 0xae, 0x6d, 0x92, 0xe6, 0x10, 0x96, 0x58, 0xb1, 0x69, 0xc9, 0x71, 0xc2, 0x37, 0x78,
+	0x63, 0x12, 0x26, 0x25, 0xae, 0x9b, 0x7c, 0x86, 0xd9, 0xcf, 0x86, 0xbd, 0xa2, 0xcb, 0x27, 0x88,
+	0x6c, 0x81, 0x49, 0x0b, 0x31, 0xdc, 0x1e, 0x34, 0xc7, 0x3a, 0xb7, 0x21, 0x5d, 0xc0, 0x6c, 0x89,
+	0x35, 0x5e, 0x93, 0x1f, 0x77, 0xfc, 0x04, 0x91, 0x4d, 0xb9, 0x26, 0xc8, 0x34, 0xe7, 0x24, 0xd8,
+	0x87, 0x94, 0x42, 0xa4, 0xe6, 0xf5, 0xbd, 0xae, 0x27, 0x15, 0xe9, 0x0b, 0x3c, 0x9c, 0x38, 0x93,
+	0x12, 0x1f, 0xe1, 0x46, 0xf5, 0xdf, 0xc5, 0x6e, 0xea, 0x0d, 0xc6, 0x62, 0xe0, 0xe2, 0xaf, 0x03,
+	0xa1, 0x8a, 0x7f, 0x60, 0x7b, 0xe4, 0x1b, 0x24, 0x39, 0x04, 0xe6, 0x1a, 0xc8, 0x5b, 0x45, 0x1d,
+	0x9c, 0x56, 0x42, 0x2e, 0xa1, 0x5e, 0xf2, 0x33, 0xf8, 0xca, 0x05, 0x79, 0x50, 0x6f, 0x17, 0x47,
+	0x91, 0x3c, 0x9e, 0x81, 0x9e, 0x9a, 0x43, 0x60, 0x76, 0x60, 0x6a, 0x0f, 0x16, 0x6a, 0x6a, 0x8f,
+	0x56, 0x94, 0x43, 0x60, 0x66, 0x68, 0x12, 0x06, 0x2b, 0x30, 0x09, 0xa3, 0x11, 0x17, 0x70, 0xdb,
+	0x8f, 0x84, 0x10, 0x2b, 0x7f, 0x9e, 0x61, 0xf2, 0x6e, 0x80, 0x99, 0x9c, 0x75, 0xa0, 0x7f, 0xaf,
+	0x2f, 0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0x59, 0x06, 0xbf, 0x1e, 0x03, 0x04, 0x00, 0x00,
 }
