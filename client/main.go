@@ -19,7 +19,7 @@ const (
 
 func main() {
 	// get configuration
-	address := flag.String("server", "go-grpc-mysql-persistent-go-grpc-test.router.default.svc.cluster.local:3000", "gRPC server in format host:port")
+	address := flag.String("server", "shiftnode1:31214", "gRPC server in format host:port")
 	flag.Parse()
 
 	// Set up a connection to the server.

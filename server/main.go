@@ -41,7 +41,7 @@ func RunServer() error {
 	flag.StringVar(&cfg.DatastoreDBHost, "db-host", os.Getenv("MYSQL_PORT_3306_TCP_ADDR"), "Database host")
 	flag.StringVar(&cfg.DatastoreDBUser, "db-user", os.Getenv("DATABASE_USER"), "Database user")
 	flag.StringVar(&cfg.DatastoreDBPassword, "db-password", os.Getenv("DATABASE_PASSWORD"), "Database password")
-	flag.StringVar(&cfg.DatastoreDBSchema, "db-schema", "ToDo", "Database schema")
+	flag.StringVar(&cfg.DatastoreDBSchema, "db-schema", os.Getenv("DATABASE_NAME"), "Database schema")
 	flag.Parse()
 
 	if len(cfg.GRPCPort) == 0 {

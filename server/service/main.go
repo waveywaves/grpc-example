@@ -68,8 +68,13 @@ func (s *toDoServiceServer) Create(ctx context.Context, req *v1.CreateRequest) (
 		return nil, status.Error(codes.InvalidArgument, "reminder field has invalid format-> "+err.Error())
 	}
 
+	res, err := c.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS ToDo ( ID bigint(20) NOT NULL AUTO_INCREMENT, Title varchar(200) DEFAULT NULL, Description varchar(1024) DEFAULT NULL, Reminder timestamp NULL DEFAULT NULL, PRIMARY KEY (ID), UNIQUE KEY ID_UNIQUE (ID))")
+	if err != nil {
+		return nil, status.Error(codes.Unknown, "failed to create table ToDo-> "+err.Error())
+	}
+
 	// insert ToDo entity data
-	res, err := c.ExecContext(ctx, "INSERT INTO ToDo(`Title`, `Description`, `Reminder`) VALUES(?, ?, ?)",
+	res, err = c.ExecContext(ctx, "INSERT INTO ToDo ( Title, Description, Reminder ) VALUES(?, ?, ?)",
 		req.ToDo.Title, req.ToDo.Description, reminder)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to insert into ToDo-> "+err.Error())
@@ -102,7 +107,7 @@ func (s *toDoServiceServer) Read(ctx context.Context, req *v1.ReadRequest) (*v1.
 	defer c.Close()
 
 	// query ToDo by ID
-	rows, err := c.QueryContext(ctx, "SELECT `ID`, `Title`, `Description`, `Reminder` FROM ToDo WHERE `ID`=?",
+	rows, err := c.QueryContext(ctx, "SELECT ID, Title, Description, Reminder FROM ToDo WHERE ID=?",
 		req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to select from ToDo-> "+err.Error())
@@ -160,7 +165,7 @@ func (s *toDoServiceServer) Update(ctx context.Context, req *v1.UpdateRequest) (
 	}
 
 	// update ToDo
-	res, err := c.ExecContext(ctx, "UPDATE ToDo SET `Title`=?, `Description`=?, `Reminder`=? WHERE `ID`=?",
+	res, err := c.ExecContext(ctx, "UPDATE ToDo SET Title=?, Description=?, Reminder=? WHERE ID=?",
 		req.ToDo.Title, req.ToDo.Description, reminder, req.ToDo.Id)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to update ToDo-> "+err.Error())
@@ -197,7 +202,7 @@ func (s *toDoServiceServer) Delete(ctx context.Context, req *v1.DeleteRequest) (
 	defer c.Close()
 
 	// delete ToDo
-	res, err := c.ExecContext(ctx, "DELETE FROM ToDo WHERE `ID`=?", req.Id)
+	res, err := c.ExecContext(ctx, "DELETE FROM ToDo WHERE ID=?", req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to delete ToDo-> "+err.Error())
 	}
@@ -233,7 +238,7 @@ func (s *toDoServiceServer) ReadAll(ctx context.Context, req *v1.ReadAllRequest)
 	defer c.Close()
 
 	// get ToDo list
-	rows, err := c.QueryContext(ctx, "SELECT `ID`, `Title`, `Description`, `Reminder` FROM ToDo")
+	rows, err := c.QueryContext(ctx, "SELECT ID, Title, Description, Reminder FROM ToDo")
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to select from ToDo-> "+err.Error())
 	}
