@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"os"
 
 	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
@@ -37,10 +38,10 @@ func RunServer() error {
 	// get configuration
 	var cfg Config
 	flag.StringVar(&cfg.GRPCPort, "grpc-port", "3000", "gRPC port to bind")
-	flag.StringVar(&cfg.DatastoreDBHost, "db-host", "", "Database host")
-	flag.StringVar(&cfg.DatastoreDBUser, "db-user", "", "Database user")
-	flag.StringVar(&cfg.DatastoreDBPassword, "db-password", "", "Database password")
-	flag.StringVar(&cfg.DatastoreDBSchema, "db-schema", "", "Database schema")
+	flag.StringVar(&cfg.DatastoreDBHost, "db-host", os.Getenv("MYSQL_PORT_3306_TCP_ADDR"), "Database host")
+	flag.StringVar(&cfg.DatastoreDBUser, "db-user", os.Getenv("DATABASE_USER"), "Database user")
+	flag.StringVar(&cfg.DatastoreDBPassword, "db-password", os.Getenv("DATABASE_PASSWORD"), "Database password")
+	flag.StringVar(&cfg.DatastoreDBSchema, "db-schema", "ToDo", "Database schema")
 	flag.Parse()
 
 	if len(cfg.GRPCPort) == 0 {
