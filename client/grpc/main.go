@@ -19,7 +19,7 @@ const (
 
 func main() {
 	// get configuration
-	address := flag.String("server", "shiftnode1:31214", "gRPC server in format host:port")
+	address := flag.String("server", "shiftnode1:31803", "gRPC server in format host:port")
 	flag.Parse()
 
 	// Set up a connection to the server.

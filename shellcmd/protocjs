@@ -1,1 +1,9 @@
-protoc -I=proto todo.proto --js_out=import_style=commonjs:proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:proto
+protoc \
+    -I/usr/local/include \
+    -I. \
+    -I$GOPATH/bin \
+    -I$GOPATH/src \
+    -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+    -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/ \
+    -I=proto todo.proto \
+    --js_out=import_style=commonjs:proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:proto

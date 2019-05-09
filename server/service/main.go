@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -21,6 +23,14 @@ const (
 // toDoServiceServer is implementation of v1.ToDoServiceServer proto interface
 type toDoServiceServer struct {
 	db *sql.DB
+}
+
+func getType(myvar interface{}) string {
+	if t := reflect.TypeOf(myvar); t.Kind() == reflect.Ptr {
+		return "*" + t.Elem().Name()
+	} else {
+		return t.Name()
+	}
 }
 
 // NewToDoServiceServer creates ToDo service
@@ -68,14 +78,38 @@ func (s *toDoServiceServer) Create(ctx context.Context, req *v1.CreateRequest) (
 		return nil, status.Error(codes.InvalidArgument, "reminder field has invalid format-> "+err.Error())
 	}
 
-	res, err := c.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS ToDo ( ID bigint(20) NOT NULL AUTO_INCREMENT, Title varchar(200) DEFAULT NULL, Description varchar(1024) DEFAULT NULL, Reminder timestamp NULL DEFAULT NULL, PRIMARY KEY (ID), UNIQUE KEY ID_UNIQUE (ID))")
+	res, err := c.ExecContext(ctx,
+		`CREATE TABLE IF NOT EXISTS ToDo 
+			( 
+				ID bigint(20) NOT NULL AUTO_INCREMENT, 
+				Title varchar(200) DEFAULT NULL, 
+				Description varchar(1024) DEFAULT NULL, 
+				Reminder timestamp NULL DEFAULT NULL, 
+				Tag varchar(1024) DEFAULT NULL, 
+				TagDesc varchar(1024) DEFAULT NULL,
+				PRIMARY KEY (ID), 
+				UNIQUE KEY ID_UNIQUE (ID)
+			)`)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to create table ToDo-> "+err.Error())
 	}
 
+	// check oneof tag type
+	todoTag := req.ToDo.GetTags()
+	tagType := getType(todoTag)
+	tag := ""
+	tagDesc := "desc"
+	if strings.Contains(tagType, "Work") {
+		tag = "Work"
+	} else if strings.Contains(tagType, "Personal") {
+		tag = "Personal"
+	} else {
+		tag = "No Tag"
+	}
+
 	// insert ToDo entity data
-	res, err = c.ExecContext(ctx, "INSERT INTO ToDo ( Title, Description, Reminder ) VALUES(?, ?, ?)",
-		req.ToDo.Title, req.ToDo.Description, reminder)
+	res, err = c.ExecContext(ctx, "INSERT INTO ToDo ( Title, Description, Reminder, Tag, TagDesc ) VALUES(?, ?, ?, ?, ?)",
+		req.ToDo.Title, req.ToDo.Description, reminder, tag, tagDesc)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to insert into ToDo-> "+err.Error())
 	}
@@ -107,7 +141,7 @@ func (s *toDoServiceServer) Read(ctx context.Context, req *v1.ReadRequest) (*v1.
 	defer c.Close()
 
 	// query ToDo by ID
-	rows, err := c.QueryContext(ctx, "SELECT ID, Title, Description, Reminder FROM ToDo WHERE ID=?",
+	rows, err := c.QueryContext(ctx, "SELECT ID, Title, Description, Reminder, Tag, TagDesc FROM ToDo WHERE ID=?",
 		req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to select from ToDo-> "+err.Error())
@@ -125,7 +159,64 @@ func (s *toDoServiceServer) Read(ctx context.Context, req *v1.ReadRequest) (*v1.
 	// get ToDo data
 	var td v1.ToDo
 	var reminder time.Time
-	if err := rows.Scan(&td.Id, &td.Title, &td.Description, &reminder); err != nil {
+	var tag string
+	var tagDesc string
+	if err := rows.Scan(&td.Id, &td.Title, &td.Description, &reminder, &tag, &tagDesc); err != nil {
+		return nil, status.Error(codes.Unknown, "failed to retrieve field values from ToDo row-> "+err.Error())
+	}
+	td.Reminder, err = ptypes.TimestampProto(reminder)
+	if err != nil {
+		return nil, status.Error(codes.Unknown, "reminder field has invalid format-> "+err.Error())
+	}
+
+	if rows.Next() {
+		return nil, status.Error(codes.Unknown, fmt.Sprintf("found multiple ToDo rows with ID='%d'",
+			req.Id))
+	}
+
+	return &v1.ReadResponse{
+		Api:  apiVersion,
+		ToDo: &td,
+	}, nil
+
+}
+
+// Read todo task
+func (s *toDoServiceServer) Readv2(ctx context.Context, req *v1.ReadRequest) (*v1.ReadResponse, error) {
+	// check if the API version requested by client is supported by server
+	if err := s.checkAPI(req.Api); err != nil {
+		return nil, err
+	}
+
+	// get SQL connection from pool
+	c, err := s.connect(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer c.Close()
+
+	// query ToDo by ID
+	rows, err := c.QueryContext(ctx, "SELECT ID, Title, Description, Reminder, Tag, TagDesc FROM ToDo WHERE ID=?",
+		req.Id)
+	if err != nil {
+		return nil, status.Error(codes.Unknown, "failed to select from ToDo-> "+err.Error())
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return nil, status.Error(codes.Unknown, "failed to retrieve data from ToDo-> "+err.Error())
+		}
+		return nil, status.Error(codes.NotFound, fmt.Sprintf("ToDo with ID='%d' is not found",
+			req.Id))
+	}
+
+	// get ToDo data
+	var td v1.ToDo
+	var reminder time.Time
+	var tag string
+	var tagDesc string
+	if err := rows.Scan(&td.Id, &td.Title, &td.Description, &reminder, &tag, &tagDesc); err != nil {
 		return nil, status.Error(codes.Unknown, "failed to retrieve field values from ToDo row-> "+err.Error())
 	}
 	td.Reminder, err = ptypes.TimestampProto(reminder)
@@ -165,8 +256,8 @@ func (s *toDoServiceServer) Update(ctx context.Context, req *v1.UpdateRequest) (
 	}
 
 	// update ToDo
-	res, err := c.ExecContext(ctx, "UPDATE ToDo SET Title=?, Description=?, Reminder=? WHERE ID=?",
-		req.ToDo.Title, req.ToDo.Description, reminder, req.ToDo.Id)
+	res, err := c.ExecContext(ctx, "UPDATE ToDo SET Title=?, Description=?, Reminder=?, Tag=?, TagDesc=? WHERE ID=?",
+		req.ToDo.Title, req.ToDo.Description, reminder, "tag", "tagdesc", req.ToDo.Id)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to update ToDo-> "+err.Error())
 	}
@@ -238,17 +329,19 @@ func (s *toDoServiceServer) ReadAll(ctx context.Context, req *v1.ReadAllRequest)
 	defer c.Close()
 
 	// get ToDo list
-	rows, err := c.QueryContext(ctx, "SELECT ID, Title, Description, Reminder FROM ToDo")
+	rows, err := c.QueryContext(ctx, "SELECT ID, Title, Description, Reminder, Tag, TagDesc FROM ToDo")
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to select from ToDo-> "+err.Error())
 	}
 	defer rows.Close()
 
 	var reminder time.Time
+	var tag string
+	var tagDesc string
 	list := []*v1.ToDo{}
 	for rows.Next() {
 		td := new(v1.ToDo)
-		if err := rows.Scan(&td.Id, &td.Title, &td.Description, &reminder); err != nil {
+		if err := rows.Scan(&td.Id, &td.Title, &td.Description, &reminder, &tag, &tagDesc); err != nil {
 			return nil, status.Error(codes.Unknown, "failed to retrieve field values from ToDo row-> "+err.Error())
 		}
 		td.Reminder, err = ptypes.TimestampProto(reminder)
